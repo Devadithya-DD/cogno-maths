@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#020617">
+  <meta name="description" content="Arithmetic Engine — a secure browser-based expression calculator.">
+  <title>Arithmetic Engine</title>
+
+  <link rel="icon" type="image/png"
+        href="https://cdn-icons-png.flaticon.com/512/2344/2344132.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #020617;
+      --surface: #0f172a;
+      --surface-2: #111c31;
+      --border: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-dark: #0284c7;
+      --success: #34d399;
+      --danger: #fb7185;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(56,189,248,.10), transparent 35%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Outfit", system-ui, sans-serif;
+    }
+
+    button, input { font: inherit; }
+
+    .app {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 42px 18px;
+    }
+
+    .container {
+      width: min(100%, 720px);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 14px;
+      color: var(--primary);
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 16px rgba(56,189,248,.7);
+      animation: pulse 1.8s infinite;
+    }
+
+    .brand-icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 15px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(56,189,248,.22);
+      border-radius: 18px;
+      background: rgba(56,189,248,.08);
+      color: var(--primary);
+      font-size: 27px;
+      box-shadow: 0 0 35px rgba(56,189,248,.08);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 7vw, 3.1rem);
+      line-height: 1;
+      letter-spacing: -.04em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .card {
+      background: rgba(15,23,42,.88);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    #expr-input {
+      min-width: 0;
+      flex: 1;
+      padding: 15px 16px;
+      border: 1px solid #334155;
+      border-radius: 13px;
+      outline: none;
+      background: #0b1425;
+      color: var(--text);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 1rem;
+      transition: .2s ease;
+    }
+
+    #expr-input::placeholder { color: #64748b; }
+
+    #expr-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(56,189,248,.10);
+    }
+
+    #calc-btn {
+      width: 56px;
+      border: 0;
+      border-radius: 13px;
+      background: var(--primary);
+      color: #03111d;
+      cursor: pointer;
+      font-size: 1.35rem;
+      font-weight: 800;
+      transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+
+    #calc-btn:hover {
+      background: #7dd3fc;
+      box-shadow: 0 8px 24px rgba(56,189,248,.20);
+    }
+
+    #calc-btn:active { transform: scale(.95); }
+
+    .result, .error {
+      margin-top: 15px;
+      padding: 16px;
+      border-radius: 14px;
+      animation: fadeIn .25s ease-out;
+    }
+
+    .result {
+      border: 1px solid #1f3d36;
+      background: rgba(15,118,110,.10);
+    }
+
+    .error {
+      border: 1px solid rgba(190,24,93,.35);
+      background: rgba(127,29,29,.18);
+      color: #fecdd3;
+    }
+
+    .label {
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: .7rem;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    #result-value {
+      color: var(--success);
+      font: 700 clamp(1.55rem, 6vw, 2.15rem)/1.2 "JetBrains Mono", monospace;
+      overflow-wrap: anywhere;
+    }
+
+    .history {
+      display: grid;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px 12px;
+      border: 1px solid rgba(51,65,85,.55);
+      border-radius: 10px;
+      background: rgba(15,23,42,.55);
+      animation: fadeIn .25s ease-out;
+    }
+
+    .history-expression {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #94a3b8;
+    }
+
+    .history-result {
+      color: var(--success);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .supports {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 7px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      padding: 4px 8px;
+      border-radius: 7px;
+      background: #0f172a;
+      color: #64748b;
+      font: 500 .72rem "JetBrains Mono", monospace;
+    }
+
+    .hint {
+      margin-top: 12px;
+      text-align: center;
+      color: #64748b;
+      font-size: .76rem;
+    }
+
+    footer {
+      margin-top: 22px;
+      padding: 18px 6px 4px;
+      text-align: center;
+      color: #475569;
+      font-size: .72rem;
+      line-height: 1.6;
+    }
+
+    footer a {
+      color: #64748b;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .hidden { display: none !important; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .45; transform: scale(.78); }
+    }
+
+    @media (max-width: 520px) {
+      .app { padding: 28px 12px; }
+      .card { padding: 16px; border-radius: 18px; }
+      .input-row { flex-direction: column; }
+      #calc-btn {
+        width: 100%;
+        height: 48px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <div class="container">
+
+      <header class="header">
+        <div class="status">
+          <span class="status-dot"></span>
+          Online
+        </div>
+
+        <div class="brand-icon" aria-hidden="true">∑</div>
+
+        <h1>Arithmetic Engine</h1>
+        <p class="subtitle">Enter an arithmetic expression to compute it instantly.</p>
+      </header>
+
+      <section class="card" aria-label="Arithmetic calculator">
+        <div class="input-row">
+          <input
+            id="expr-input"
+            type="text"
+            inputmode="decimal"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="e.g. (12 + 8) * 3 / 2 ^ 4"
+            aria-label="Arithmetic expression"
+          >
+          <button id="calc-btn" type="button" aria-label="Calculate">=</button>
+        </div>
+
+        <div id="result-area" class="result hidden" aria-live="polite">
+          <div class="label">Result</div>
+          <div id="result-value"></div>
+        </div>
+
+        <div id="error-area" class="error hidden" role="alert">
+          <div id="error-msg"></div>
+        </div>
+
+        <div id="history" class="history" aria-label="Calculation history"></div>
+
+        <div class="supports" aria-label="Supported operators">
+          <span class="tag">+ −</span>
+          <span class="tag">× ÷</span>
+          <span class="tag">^ power</span>
+          <span class="tag">% modulo</span>
+          <span class="tag">( )</span>
+        </div>
+
+        <div class="hint">Press Enter to calculate • No eval() used</div>
+      </section>
+
+      <footer>
+        <strong>© 2026 Devadithya. All Rights Reserved.</strong><br>
+        Proprietary software and design. Unauthorized reproduction, substantial imitation,
+        extraction, redistribution, or reuse of protected components is prohibited.<br>
+        <a href="LICENSE.txt">View full license</a>
+      </footer>
+
+    </div>
+  </main>
+
+  <script>
+    "use strict";
+
+    /*
+      PROPRIETARY SOFTWARE
+      Copyright © 2026 Devadithya. All Rights Reserved.
+
+      The original implementation, interface, distinctive visual identity,
+      calculation implementation, workflows, and other protected components
+      are proprietary. See LICENSE.txt for the complete license.
+
+      IMPORTANT:
+      This parser intentionally does NOT use eval() or Function().
+    */
+
+    function compute(expression) {
+      const tokens = tokenize(expression);
+      if (tokens.length === 0) throw new Error("Enter an expression.");
+
+      const result = parseExpression(tokens, 0);
+
+      if (result.pos !== tokens.length) {
+        throw new Error("Unexpected token: " + displayToken(tokens[result.pos]));
+      }
+
+      if (!Number.isFinite(result.value)) {
+        throw new Error("The result is outside the supported numeric range.");
+      }
+
+      return result.value;
+    }
+
+    function tokenize(expression) {
+      const tokens = [];
+      let i = 0;
+
+      while (i < expression.length) {
+        const ch = expression[i];
+
+        if (/\s/.test(ch)) {
+          i++;
+          continue;
+        }
+
+        if (/[0-9.]/.test(ch)) {
+          const start = i;
+          let dots = 0;
+
+          while (i < expression.length && /[0-9.]/.test(expression[i])) {
+            if (expression[i] === ".") dots++;
+            i++;
+          }
+
+          const raw = expression.slice(start, i);
+
+          if (dots > 1 || raw === ".") {
+            throw new Error("Invalid number: " + raw);
+          }
+
+          const value = Number(raw);
+          if (!Number.isFinite(value)) {
+            throw new Error("Invalid number: " + raw);
+          }
+
+          tokens.push(value);
+          continue;
+        }
+
+        if ("+-*/%^()".includes(ch)) {
+          tokens.push(ch);
+          i++;
+          continue;
+        }
+
+        throw new Error("Unsupported character: " + ch);
+      }
+
+      return tokens;
+    }
+
+    function parseExpression(tokens, pos) {
+      return parseAdd(tokens, pos);
+    }
+
+    function parseAdd(tokens, pos) {
+      let left = parseMultiply(tokens, pos);
+
+      while (tokens[left.pos] === "+" || tokens[left.pos] === "-") {
+        const operator = tokens[left.pos];
+        const right = parseMultiply(tokens, left.pos + 1);
+
+        left = {
+          value: operator === "+"
+            ? left.value + right.value
+            : left.value - right.value,
+          pos: right.pos
+        };
+      }
+
+      return left;
+    }
+
+    function parseMultiply(tokens, pos) {
+      let left = parseUnary(tokens, pos);
+
+      while (
+        tokens[left.pos] === "*" ||
+        tokens[left.pos] === "/" ||
+        tokens[left.pos] === "%"
+      ) {
+        const operator = tokens[left.pos];
+        const right = parseUnary(tokens, left.pos + 1);
+
+        if (operator === "/" && right.value === 0) {
+          throw new Error("Division by zero.");
+        }
+
+        if (operator === "%" && right.value === 0) {
+          throw new Error("Modulo by zero.");
+        }
+
+        let value;
+
+        if (operator === "*") value = left.value * right.value;
+        if (operator === "/") value = left.value / right.value;
+        if (operator === "%") value = left.value % right.value;
+
+        left = { value, pos: right.pos };
+      }
+
+      return left;
+    }
+
+    function parseUnary(tokens, pos) {
+      if (tokens[pos] === "+") {
+        return parseUnary(tokens, pos + 1);
+      }
+
+      if (tokens[pos] === "-") {
+        const value = parseUnary(tokens, pos + 1);
+        return { value: -value.value, pos: value.pos };
+      }
+
+      return parsePower(tokens, pos);
+    }
+
+    function parsePower(tokens, pos) {
+      const base = parseAtom(tokens, pos);
+
+      if (tokens[base.pos] === "^") {
+        // Right-associative: 2 ^ 3 ^ 2 = 2 ^ (3 ^ 2)
+        const exponent = parseUnary(tokens, base.pos + 1);
+        const value = Math.pow(base.value, exponent.value);
+
+        if (!Number.isFinite(value)) {
+          throw new Error("The power operation produced an unsupported result.");
+        }
+
+        return { value, pos: exponent.pos };
+      }
+
+      return base;
+    }
+
+    function parseAtom(tokens, pos) {
+      const token = tokens[pos];
+
+      if (typeof token === "number") {
+        return { value: token, pos: pos + 1 };
+      }
+
+      if (token === "(") {
+        const inner = parseExpression(tokens, pos + 1);
+
+        if (tokens[inner.pos] !== ")") {
+          throw new Error("Missing closing parenthesis.");
+        }
+
+        return { value: inner.value, pos: inner.pos + 1 };
+      }
+
+      if (token === undefined) {
+        throw new Error("Incomplete expression.");
+      }
+
+      throw new Error("Unexpected token: " + displayToken(token));
+    }
+
+    function displayToken(token) {
+      return typeof token === "string" ? token : String(token);
+    }
+
+    const input = document.getElementById("expr-input");
+    const resultArea = document.getElementById("result-area");
+    const resultValue = document.getElementById("result-value");
+    const errorArea = document.getElementById("error-area");
+    const errorMsg = document.getElementById("error-msg");
+    const history = document.getElementById("history");
+    const calcButton = document.getElementById("calc-btn");
+
+    function formatResult(value) {
+      if (Object.is(value, -0)) return "0";
+      if (Number.isInteger(value)) return value.toString();
+
+      return Number(value.toPrecision(12)).toString();
+    }
+
+    function calculate() {
+      const expression = input.value.trim();
+
+      resultArea.classList.add("hidden");
+      errorArea.classList.add("hidden");
+
+      if (!expression) {
+        showError("Enter an expression.");
+        input.focus();
+        return;
+      }
+
+      try {
+        const value = compute(expression);
+        const result = formatResult(value);
+
+        resultValue.textContent = result;
+        resultArea.classList.remove("hidden");
+
+        addHistory(expression, result);
+      } catch (error) {
+        showError(error instanceof Error ? error.message : "Unable to calculate expression.");
+      }
+    }
+
+    function showError(message) {
+      errorMsg.textContent = message;
+      errorArea.classList.remove("hidden");
+    }
+
+    function addHistory(expression, result) {
+      const item = document.createElement("div");
+      item.className = "history-item";
+
+      const expressionSpan = document.createElement("span");
+      expressionSpan.className = "history-expression";
+      expressionSpan.textContent = expression;
+
+      const resultSpan = document.createElement("span");
+      resultSpan.className = "history-result";
+      resultSpan.textContent = result;
+
+      item.append(expressionSpan, resultSpan);
+      history.prepend(item);
+
+      while (history.children.length > 5) {
+        history.lastElementChild.remove();
+      }
+    }
+
+    calcButton.addEventListener("click", calculate);
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") calculate();
+      if (event.key === "Escape") {
+        input.value = "";
+        resultArea.classList.add("hidden");
+        errorArea.classList.add("hidden");
+        input.focus();
+      }
+    });
+
+    input.focus();
+  </script>
+</body>
+</html>

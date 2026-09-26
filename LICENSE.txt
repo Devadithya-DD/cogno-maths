@@ -1,0 +1,70 @@
+PROPRIETARY SOFTWARE & DESIGN LICENSE
+
+Copyright © 2026 Devadithya. All Rights Reserved.
+
+This online calculator and all of its original components constitute proprietary
+intellectual property of Devadithya ("Owner"). This includes, where legally
+protectable, the source code, implementation, original calculation logic,
+workflows, interface design, layouts, graphics, animations, visual effects,
+branding, naming, original text, documentation, and distinctive combinations
+of visual elements.
+
+1. NO UNAUTHORIZED REPRODUCTION
+No permission is granted to copy, reproduce, substantially imitate, modify,
+adapt, redistribute, publish, sell, sublicense, mirror, republish, extract,
+or reuse protected portions of this project without prior written permission
+from the Owner.
+
+2. DESIGN & VISUAL IDENTITY
+The distinctive combination of colours, layout, typography, interface
+arrangement, animations, graphics, and other visual elements may not be
+intentionally reproduced or closely imitated as a substantially similar
+design without written authorization.
+
+Individual colours, common UI conventions, basic shapes, mathematical
+concepts, and other elements that are not independently protectable are not
+claimed as exclusive property.
+
+3. TECHNIQUES & IMPLEMENTATION
+The project's original implementation techniques, code structures, workflows,
+and interaction mechanisms may not be intentionally reproduced or
+substantially replicated in another project without written authorization.
+
+This does not claim exclusive ownership of general programming knowledge,
+mathematical principles, standard algorithms, or independently developed
+solutions where applicable law does not provide such protection.
+
+4. SOURCE CODE
+Accessing or viewing the website does not grant ownership or a license to
+copy, reconstruct, redistribute, or reuse substantial portions of its
+implementation.
+
+5. NO DERIVATIVE OR SUBSTANTIALLY IMITATIVE WORKS
+You may not create a derivative or substantially imitative version that
+reproduces protected expression, code, assets, or distinctive presentation
+without permission.
+
+6. NO REDISTRIBUTION
+Protected project materials may not be sold, published, sublicensed,
+mirrored, packaged, uploaded, or redistributed without authorization.
+
+7. THIRD-PARTY MATERIALS
+Third-party libraries, fonts, services, APIs, icons, and other external
+materials remain subject to their own licenses and are not claimed as the
+Owner's exclusive property.
+
+8. NO IMPLIED LICENSE
+No permission is granted merely because the website is publicly accessible.
+Any exception must be explicitly granted in writing by the Owner.
+
+9. ENFORCEMENT
+Unauthorized reproduction, distribution, or infringement of legally protected
+intellectual property may be subject to enforcement under applicable law.
+
+10. RESERVATION OF RIGHTS
+All rights not expressly granted are reserved by the Owner.
+
+Owner: Devadithya
+Copyright: © 2026 Devadithya
+License: Proprietary / All Rights Reserved
+Permission: Written authorization required for reuse of protected material.
